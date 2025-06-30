@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { add as Plus, user as UserPlus, folder as Store, file-text as FileText } from 'lucide-react';
+import { Plus, UserPlus, Store, FileText } from 'lucide-react';
 
 const actions = [
   { title: 'Add New Assets', icon: Plus, bgColor: 'bg-blue-200 hover:bg-blue-300' },

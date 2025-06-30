@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { 
-  database as Database, 
-  folder as Folder, 
-  user as User, 
-  file-text as FileText,
-  folder-open as FolderOpen
+  Database, 
+  Folder, 
+  User, 
+  FileText,
+  FolderOpen
 } from 'lucide-react';
 
 const menuItems = [
