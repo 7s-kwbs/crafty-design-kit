@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Database, 
   Folder, 
@@ -9,16 +10,21 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Dashboard', icon: Database, active: true },
-  { name: 'Asset Management', icon: FolderOpen },
-  { name: 'User Management', icon: User },
-  { name: 'Vendor Management', icon: Folder },
-  { name: 'Report', icon: FileText },
-  { name: 'Maintenance', icon: Database },
+  { name: 'Dashboard', icon: Database, path: '/' },
+  { name: 'Asset Management', icon: FolderOpen, path: '/asset-management' },
+  { name: 'User Management', icon: User, path: '/user-management' },
+  { name: 'Vendor Management', icon: Folder, path: '/vendor-management' },
+  { name: 'Report', icon: FileText, path: '/report' },
+  { name: 'Maintenance', icon: Database, path: '/maintenance' },
 ];
 
 export const Sidebar = () => {
-  const [activeItem, setActiveItem] = useState('Dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   return (
     <div className="w-64 bg-slate-300 shadow-lg">
@@ -29,12 +35,12 @@ export const Sidebar = () => {
       <nav className="mt-4">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeItem === item.name;
+          const isActive = location.pathname === item.path;
           
           return (
             <button
               key={item.name}
-              onClick={() => setActiveItem(item.name)}
+              onClick={() => handleNavigation(item.path)}
               className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
                 isActive 
                   ? 'bg-slate-400 text-slate-900 border-r-4 border-blue-600' 
