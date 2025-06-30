@@ -1,221 +1,161 @@
 
 import React, { useState } from 'react';
-import { Header } from '@/components/Header';
-import { Sidebar } from '@/components/Sidebar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, FileText, MoreHorizontal } from 'lucide-react';
-import { 
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import { Search, Download, Plus, Filter } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const AssetManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
-  // Sample data - you can replace this with actual data
-  const sampleAssets = Array.from({ length: 15 }, (_, index) => ({
-    id: `A${String(index + 1).padStart(3, '0')}`,
-    name: `Asset ${index + 1}`,
-    category: ['Electronics', 'Furniture', 'Vehicles', 'Equipment'][index % 4],
-    department: ['IT', 'HR', 'Finance', 'Operations'][index % 4],
-    location: ['Building A', 'Building B', 'Warehouse', 'Remote'][index % 4],
-    status: ['Active', 'Maintenance', 'Retired', 'Available'][index % 4],
-    value: `$${(Math.random() * 10000 + 1000).toFixed(2)}`,
-    qrCode: `QR${String(index + 1).padStart(3, '0')}`
-  }));
+  // Sample data for the table
+  const assets = [
+    { id: 'AST001', name: 'MacBook Pro', category: 'Laptop', status: 'Active', assignee: 'John Doe', location: 'Office A', purchaseDate: '2023-01-15' },
+    { id: 'AST002', name: 'iPhone 14', category: 'Mobile', status: 'Assigned', assignee: 'Jane Smith', location: 'Office B', purchaseDate: '2023-02-10' },
+    { id: 'AST003', name: 'Dell Monitor', category: 'Monitor', status: 'Available', assignee: '-', location: 'Storage', purchaseDate: '2023-03-05' },
+    { id: 'AST004', name: 'Office Chair', category: 'Furniture', status: 'Maintenance', assignee: '-', location: 'Office C', purchaseDate: '2022-12-01' },
+    { id: 'AST005', name: 'Printer HP', category: 'Printer', status: 'Active', assignee: 'Bob Wilson', location: 'Office A', purchaseDate: '2023-01-20' },
+  ];
+
+  const getStatusBadge = (status: string) => {
+    const variants: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
+      'Active': 'default',
+      'Assigned': 'secondary',
+      'Available': 'outline',
+      'Maintenance': 'destructive'
+    };
+    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
+  };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto">
-            {/* Header Section */}
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-800">Asset Management</h1>
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <FileText size={16} />
-                  Export
-                </Button>
-                <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
-                  <Plus size={16} />
-                  Add Asset
-                </Button>
+    <div className="p-6 bg-gray-100 min-h-full">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Asset Management</h1>
+          <p className="text-gray-600 mt-2">Manage and track your organization's assets</p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search assets..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
+              
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="assigned">Assigned</SelectItem>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="maintenance">Maintenance</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="laptop">Laptop</SelectItem>
+                  <SelectItem value="mobile">Mobile</SelectItem>
+                  <SelectItem value="monitor">Monitor</SelectItem>
+                  <SelectItem value="furniture">Furniture</SelectItem>
+                  <SelectItem value="printer">Printer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Filters Section */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Search Assets
-                  </label>
-                  <Input
-                    placeholder="Asset ID, Name"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
-                      <SelectItem value="electronics">Electronics</SelectItem>
-                      <SelectItem value="furniture">Furniture</SelectItem>
-                      <SelectItem value="vehicles">Vehicles</SelectItem>
-                      <SelectItem value="equipment">Equipment</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Department
-                  </label>
-                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Departments" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Departments</SelectItem>
-                      <SelectItem value="it">IT</SelectItem>
-                      <SelectItem value="hr">HR</SelectItem>
-                      <SelectItem value="finance">Finance</SelectItem>
-                      <SelectItem value="operations">Operations</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="maintenance">Maintenance</SelectItem>
-                      <SelectItem value="retired">Retired</SelectItem>
-                      <SelectItem value="available">Available</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location
-                  </label>
-                  <Select value={locationFilter} onValueChange={setLocationFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Remote" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Locations</SelectItem>
-                      <SelectItem value="building-a">Building A</SelectItem>
-                      <SelectItem value="building-b">Building B</SelectItem>
-                      <SelectItem value="warehouse">Warehouse</SelectItem>
-                      <SelectItem value="remote">Remote</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            {/* Data Table */}
-            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-medium text-gray-700">Asset ID</TableHead>
-                    <TableHead className="font-medium text-gray-700">Asset Name</TableHead>
-                    <TableHead className="font-medium text-gray-700">Category</TableHead>
-                    <TableHead className="font-medium text-gray-700">Department</TableHead>
-                    <TableHead className="font-medium text-gray-700">Location</TableHead>
-                    <TableHead className="font-medium text-gray-700">Status</TableHead>
-                    <TableHead className="font-medium text-gray-700">Value</TableHead>
-                    <TableHead className="font-medium text-gray-700">QR Code</TableHead>
-                    <TableHead className="font-medium text-gray-700 w-10"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sampleAssets.map((asset) => (
-                    <TableRow key={asset.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">{asset.id}</TableCell>
-                      <TableCell>{asset.name}</TableCell>
-                      <TableCell>{asset.category}</TableCell>
-                      <TableCell>{asset.department}</TableCell>
-                      <TableCell>{asset.location}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          asset.status === 'Active' ? 'bg-green-100 text-green-800' :
-                          asset.status === 'Maintenance' ? 'bg-yellow-100 text-yellow-800' :
-                          asset.status === 'Retired' ? 'bg-red-100 text-red-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
-                          {asset.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>{asset.value}</TableCell>
-                      <TableCell>{asset.qrCode}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal size={16} />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              <div className="flex justify-between items-center p-4 border-t">
-                <div className="text-sm text-gray-500">
-                  Previous 1 2 Next
-                </div>
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">2</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext href="#" />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Export
+              </Button>
+              <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4" />
+                Add Asset
+              </Button>
             </div>
           </div>
-        </main>
+        </div>
+
+        {/* Assets Table */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Asset ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Assignee</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Purchase Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {assets.map((asset) => (
+                <TableRow key={asset.id}>
+                  <TableCell className="font-medium">{asset.id}</TableCell>
+                  <TableCell>{asset.name}</TableCell>
+                  <TableCell>{asset.category}</TableCell>
+                  <TableCell>{getStatusBadge(asset.status)}</TableCell>
+                  <TableCell>{asset.assignee}</TableCell>
+                  <TableCell>{asset.location}</TableCell>
+                  <TableCell>{asset.purchaseDate}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mt-6">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-700">
+              Showing 1 to 5 of 5 results
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" disabled>
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
+                1
+              </Button>
+              <Button variant="outline" size="sm" disabled>
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
